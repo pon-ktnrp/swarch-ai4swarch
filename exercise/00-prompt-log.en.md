@@ -20,5 +20,5 @@ Log every request you send to the agent. "Files the agent read" is what the agen
 | 3 | 2-a | Codex / GPT-6 | Follow `prompts/2-write-adr.md`; run a; context: none; draft an ADR for MailFast confirmations, loyalty points, analytics, and future post-order actions; update the prompt log with all files read. | `prompts/2-write-adr.md`<br>`docs/adr/template.md`<br> |yes |3 |Not complete |
 | 4 | 2-b | Codex / GPT-6 | Follow `prompts/2-write-adr.md`; run b; use the scenario, Redis ADR and checkout code to draft an ADR for MailFast confirmations, loyalty points, analytics and future post-order actions; update this log with all files read; no terminal commands. | `prompts/2-write-adr.md`<br>`docs/adr/template.md`<br>`docs/scenario.md`<br>`docs/adr/0001-use-redis-for-cart-storage.md`<br>`system/online-boutique/src/checkoutservice/main.go`<br>|yes |4 |Almost complete adr |
 | 5 | 3 | Codex / GPT-6 | Follow `prompts/3-review-adr.md`; review `docs/adr/0002-use-rabbitmq-for-post-order-actions.md`; update this log with agent/model, message summary and all files read; leave assessment fields blank; no terminal commands. | `prompts/3-review-adr.md`<br>`docs/adr/0002-use-rabbitmq-for-post-order-actions.md`<br>`docs/scenario.md` |yes |4 |good second check |
-| 6 | | | | | | | |
+| 6 |bonus |Codex / GPT-6 | | | | | |
 | 7 | | | | | | | |
