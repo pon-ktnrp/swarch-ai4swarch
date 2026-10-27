@@ -33,10 +33,10 @@ requirement: <paste R-12 here>
 
 | Criterion | Run a | Run b |
 |---|---|---|
-| Uses the scenario's numbers (latency, peak, MailFast limits)? | | |
-| Options considered (list them) | | |
-| Handles "exactly once" loyalty points and MailFast's rate limit? How? | | |
-| Anything invented (a number, tool or fact not in the scenario)? | | |
+| Uses the scenario's numbers (latency, peak, MailFast limits)? |No. The supplied R-12 requirement did not include these numbers. The draft leaves workload, latency targets and MailFast limits as open questions. |Yes. It uses checkout p95 ≤ 500 ms, approximately 300 ms today, peak load of 200 orders/s, and MailFast’s p95 1.5 s, p99 8 s, approximately 0.5% failures and 50 emails/s limit. These match docs/scenario.md, Quality goals and constraints. |
+| Options considered (list them) |1. Direct synchronous calls. 2. Durable event fan-out with independent subscriptions. |1. Synchronous checkout orchestration. 2. Durable job table with a central dispatcher. 3. RabbitMQ publish/subscribe with a transactional outbox and independent consumers. |
+| Handles "exactly once" loyalty points and MailFast's rate limit? How? |It proposes stable identifiers and atomic deduplication of loyalty updates to prevent duplicate points. However, it does not specify the one-minute deadline or a MailFast rate limiter because these constraints were not supplied. |It proposes atomically recording a unique (order_id, action) key with the points update, making duplicate deliveries no-ops. It also proposes a shared limiter capped at 50 MailFast attempts/s and separate queues so email delays do not block loyalty. It acknowledges that long outages can prevent meeting the one-minute deadline. |
+| Anything invented (a number, tool or fact not in the scenario)? |No unsupported numerical targets were introduced. The broker, event contract and outbox are proposed design additions. They are not presented as existing infrastructure. |RabbitMQ, the outbox, new durable storage and consumer mechanisms are proposed additions.  |
 
 ## Take ownership: your final ADR
 
@@ -49,6 +49,6 @@ You will defend this ADR in front of a review board in Part B, so make sure you 
 
 | # | What you changed from the AI's draft | Why |
 |---|---|---|
-| 1 | | |
-| 2 | | |
-| 3 | | |
+| 1 | Added a checkout retry policy requiring a stable idempotency key, one order identity, durable processing state and recovery validation. | The existing handler generates a new UUID per invocation (`system/online-boutique/src/checkoutservice/main.go:233–236`). Request-level retry safety needs explicit treatment to improve correctness and reliability. |
+| 2 | Added event compatibility rules covering optional fields, incompatible versions, migration and compatibility testing. | The scenario anticipates more post-order actions (`docs/scenario.md:14`). These rules improve modifiability as consumers evolve. |
+| 3 | Assigned recovery responsibilities by role and added requirements for authorized, recorded replay. Named individuals remain an open question. | The draft proposes outbox recovery and dead-letter handling but leaves ownership unresolved. Clear responsibilities improve operability and controlled recovery. |
